@@ -6,6 +6,7 @@ import soundfile as sf
 import sklearn
 
 import code_extract_mfccs
+import code_train
 
 #import tensorflow as tf
 #import tensorflow_datasets as tfds
@@ -28,7 +29,6 @@ plt.ylabel('Amplitude')
 plt.show()
 
 
-
 # Example of MFCC extraction and visualization
 mfccs = code_extract_mfccs.extract_mfccs(audiopath)
 print(f"Shape of the MFCCs: {mfccs.shape}")
@@ -38,3 +38,6 @@ plt.colorbar()
 plt.title('MFCCs')
 plt.tight_layout()
 plt.show()
+
+# Prepare the dataset using the function from code_train.py
+code_train.prepare_dataset_scikit_learn('data/speech_commands_v0.02')

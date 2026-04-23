@@ -4,8 +4,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 import code_extract_mfccs as cemfccs
 
-# Main directory of the dataset (adjust)
-data_dir = 'speech_commands_v0.02'
+# Main directory of the dataset 
+data_dir = 'data/speech_commands_v0.02'
 
 def prepare_dataset_scikit_learn(data_directory, sr=16000, n_mfcc=13):
     X = [] # Features (MFCCs)
