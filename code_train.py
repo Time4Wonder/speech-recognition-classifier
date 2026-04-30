@@ -17,7 +17,7 @@ def prepare_dataset_scikit_learn(data_directory, sr=16000, n_mfcc=13):
     loop or reduce the list of allowed words.
     """
     
-    allowed_words = ['yes', 'no', 'up', 'down', 'left', 'right', 'on', 'off', 'stop', 'go']
+    allowed_words = ['yes', 'no']
     X = []
     y = []
     
