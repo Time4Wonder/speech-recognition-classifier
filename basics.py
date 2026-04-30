@@ -39,5 +39,5 @@ plt.title('MFCCs')
 plt.tight_layout()
 plt.show()
 
-# Prepare the dataset using the function from code_train.py
-code_train.prepare_dataset_scikit_learn('data/speech_commands_v0.02')
+# Prepare the dataset using the function from code_train.py   (mach der beim laden des packages train_class.py)
+# code_train.prepare_dataset_scikit_learn('data/speech_commands_v0.02')
