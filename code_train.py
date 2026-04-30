@@ -2,39 +2,65 @@ import os
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
+from tqdm import tqdm
 import code_extract_mfccs as cemfccs
 
 # Main directory of the dataset 
 data_dir = 'data/speech_commands_v0.02'
 
-def prepare_dataset_scikit_learn(data_directory, sr=16000, n_mfcc=13):
-    X = [] # Features (MFCCs)
-    y = [] # Labels
-    
+def _count_wav_files(data_directory, allowed_words):
     """
+    Count total number of wav files for progress bar.
+    
+    Args:
+        data_directory (str): Path to the dataset directory.
+        allowed_words (list): List of allowed word labels.
+    
+    Returns:
+        int: Total number of wav files
+    """
+    total_files = 0
+    for root, _, files in os.walk(data_directory):
+        for file in files:
+            if file.endswith('.wav'):
+                label = os.path.basename(root)
+                if label in allowed_words:
+                    total_files += 1
+    return total_files
+
+def prepare_dataset_scikit_learn(data_directory, sr=16000, n_mfcc=13):
+    """
+    Prepare dataset for scikit-learn with progress bar during audio file loading.
+    
     In this example ten commands are used for the training.
     As a first step we recommend to start with a binary classification. For this remove the
     loop or reduce the list of allowed words.
     """
     
     allowed_words = ['yes', 'no', 'up', 'down', 'left', 'right', 'on', 'off', 'stop', 'go']
+    X = []
+    y = []
     
-    # You can also add _background_noise_ and _unknown_
-    for root, _, files in os.walk(data_directory):
-        for file in files:
-            if file.endswith('.wav'):
-                label = os.path.basename(root)
-                if label in allowed_words:
-                    file_path = os.path.join(root, file)
-                    try:
-                        # Hinweis: Die Funktion extract_mfccs muss separat definiert sein
-                        mfccs = cemfccs.extract_mfccs(file_path, sr=sr, n_mfcc=n_mfcc)
-                        # For scikit-learn: Average MFCCs over time
-                        mfccs_mean = np.mean(mfccs, axis=1)
-                        X.append(mfccs_mean)
-                        y.append(label)
-                    except Exception as e:
-                        print(f"Error processing {file_path}: {e}")
+    # Count total files for progress bar
+    total_files = _count_wav_files(data_directory, allowed_words)
+    
+    # Load audio files with progress bar
+    with tqdm(total=total_files, desc="Processing audio files", unit="file") as pbar:
+        for root, _, files in os.walk(data_directory):
+            for file in files:
+                if file.endswith('.wav'):
+                    label = os.path.basename(root)
+                    if label in allowed_words:
+                        file_path = os.path.join(root, file)
+                        try:
+                            mfccs = cemfccs.extract_mfccs(file_path, sr=sr, n_mfcc=n_mfcc)
+                            mfccs_mean = np.mean(mfccs, axis=1)
+                            X.append(mfccs_mean)
+                            y.append(label)
+                        except Exception as e:
+                            tqdm.write(f"Error processing {file_path}: {e}")
+                        finally:
+                            pbar.update(1)
 
     # Convert to numpy arrays after collecting all files
     X = np.array(X)
